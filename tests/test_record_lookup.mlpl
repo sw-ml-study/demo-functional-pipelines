@@ -1,0 +1,29 @@
+record = {layers: 12, name: "tiny"}
+
+@test {name: "has_field finds an existing field", tags: ["record", "lookup"]}
+def u:test_existing_field_presence() { "Verify has_field reports an existing field.";
+  u:assert_eq(has_field(record, "layers"), 1, "existing field is present")
+}
+
+@test {name: "has_field rejects a missing field", tags: ["record", "lookup", "missing"]}
+def u:test_missing_field_presence() { "Verify has_field reports a missing field without raising.";
+  u:assert_eq(has_field(record, "missing"), 0, "missing field is absent")
+}
+
+@test {name: "record_get returns an existing value", tags: ["record", "lookup"]}
+def u:test_existing_field_value() { "Verify record_get wraps an existing value in Ok.";
+  u:assert_eq(record_get(record, "layers"), ok(12), "existing lookup succeeds")
+}
+
+@test {name: "record_get describes a missing field", tags: ["record", "lookup", "missing"]}
+def u:test_missing_field_error() { "Verify record_get returns the stable missing-field diagnostic.";
+  expected = err({available: "layers, name", field: "missing", kind: "missing_field", message: "no field `missing` (present: layers, name)"});
+  u:assert_eq(record_get(record, "missing"), expected, "missing lookup returns diagnostic")
+}
+
+@test {name: "has_field handles an empty record", tags: ["record", "lookup", "empty"]}
+def u:test_empty_record() { "Verify empty records have no fields.";
+  u:assert_eq(has_field({}, "anything"), 0, "empty record has no requested field")
+}
+
+u:run_registered_tests()

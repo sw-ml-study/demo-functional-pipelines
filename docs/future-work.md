@@ -12,7 +12,7 @@ current blocker.
 |---|---|---|---|
 | 1 | Collection-oriented application | unblocked | shipped array, record, sorting, and selection operations |
 | 2 | Result-composition application | unblocked | `map_ok`, `and_then`, `or_else`, `record_get`, and `?` |
-| 3 | mlplunit adoption | unblocked with external tool | compatible mlplunit installation or checkout |
+| 3 | Expand mlplunit coverage | partially delivered | compatible mlplunit installation or checkout |
 | 4 | Functional record updates and lenses | conditional | audit shipped sw-MLPL record/lens semantics first |
 | 5 | Allocation and fusion evidence | partially unblocked | reproducible measurement design; compiler telemetry may require upstream work |
 | 6 | Catalog and documentation maturity | unblocked | existing validation scripts |
@@ -64,31 +64,29 @@ Acceptance criteria:
 
 Blocker status: none confirmed.
 
-## 3. Adopt mlplunit
+## 3. Expand mlplunit coverage
 
-Motivation: demos currently self-check in their final Result, while the adjacent
-`demo-algorithms` repository uses mlplunit for named discovery, isolation,
-selection, and machine-readable test output.
+Motivation: demos remain self-checking in their final Result, while reusable
+source behavior benefits from mlplunit's named discovery, isolation, selection,
+and machine-readable test output.
 
-Current baseline: `scripts/run-all` reliably executes catalog demos, and
-`tests/record_lookup.mlpl` is a standalone acceptance program. There is no root
-mlplunit configuration or named test catalog.
+Current baseline: adoption is complete. The root `mlplunit.conf`,
+`scripts/run-tests`, and thin `just tests`, `just tap`, and `just list-tests`
+recipes provide native reporting. `tests/test_record_lookup.mlpl` contains five
+named tests, and `just check` runs the suite in TAP mode alongside every
+standalone demo.
 
 Acceptance criteria:
 
-- Add a root `mlplunit.conf` with repository source-root configuration.
-- Move reusable assertions to mlplunit's supplied prelude rather than copying
-  local assertion helpers.
 - Provide named tests for each reusable source module and keep narrated demos
   self-checking.
-- Support focused selection, list mode, human output, and TAP output through
-  thin `just` recipes.
-- Make `just check` run the isolated test suite and verify that every runnable
-  source module has registered coverage.
+- Add a catalog or structural check proving every reusable source module has
+  registered native coverage.
+- Prefer parameterized `@cases` when future behavior has a natural input/output
+  table.
 
-Blocker status: no sw-MLPL blocker is known. The task depends on an installed or
-adjacent compatible mlplunit executable and should pin the inspected versions in
-its adoption report.
+Blocker status: no sw-MLPL blocker is known. The remaining work is incremental
+coverage, not test-runner adoption.
 
 ## 4. Functional record updates and lenses
 

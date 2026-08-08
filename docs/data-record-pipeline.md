@@ -23,4 +23,5 @@ work and intermediate storage are linear in the score count. There are zero
 explicit loops in the demo.
 
 `has_field` and `record_get` provide exception-free schema access. See
-`tests/record_lookup.mlpl` for the executable downstream acceptance contract.
+`tests/test_record_lookup.mlpl` for the executable downstream acceptance
+contract and named mlplunit reporting.

@@ -46,12 +46,26 @@ For complete verification:
 
 ```sh
 just demos
+just tests
+just tap
+just list-tests
 just audit
 just check
 ```
 
 `just demos` executes every runnable catalog row. `just audit` validates the
 repository structure, catalog, documentation links, and record-lookup contract.
+`just tests` delegates native `@test` discovery, isolation, and human reporting
+to [mlplunit](https://github.com/softwarewrighter/mlplunit); `just tap` emits
+TAP, and `just list-tests` shows discovered cases without running them.
+
+The test runner honors `MLPLUNIT` and `MLPL`, then looks for `mlplunit` on
+`PATH` and in the adjacent development checkout. It never installs or replaces
+either tool. Standalone examples remain self-checking demos; reusable behavior
+is exercised separately through native tests under `tests/`.
+
+The adoption was verified with mlplunit `0.1.0` at commit `a06191f` and
+mlpl-repl `0.20.0` built from sw-MLPL commit `5ef1ef72`.
 
 ## Repository map
 
@@ -62,7 +76,9 @@ demos/evaluation/          self-checking numeric and JSON applications
 docs/upstream-contract.md  verified capabilities and feature-pressure template
 scripts/check              pre-commit validation gate
 scripts/run-all            catalog-driven demo execution
+scripts/run-tests          mlplunit selection and reporting wrapper
 scripts/validate-catalog   catalog schema and path audit
+tests/                     native mlplunit suites
 ```
 
 See [future work](docs/future-work.md) for prioritized applications, testing

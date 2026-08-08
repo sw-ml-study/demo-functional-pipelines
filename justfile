@@ -11,6 +11,18 @@ audit:
     ./scripts/validate-catalog catalog/demos.tsv
     ./scripts/test-record-lookup
 
+# Run native mlplunit tests; extra arguments are forwarded to mlplunit.
+tests *args:
+    ./scripts/run-tests {{args}}
+
+# Run native tests with TAP reporting.
+tap *args:
+    ./scripts/run-tests --format tap {{args}}
+
+# List tests discovered by mlplunit.
+list-tests:
+    ./scripts/run-tests --list
+
 demos:
     ./scripts/run-all
 

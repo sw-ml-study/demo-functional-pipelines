@@ -19,7 +19,8 @@ program, expected behavior, observed behavior, and fallback assessment.
 
 ## Delivered safe record lookup
 
-`tests/record_lookup.mlpl` pins the downstream contract: membership returns
+`tests/test_record_lookup.mlpl` pins the downstream contract through five named
+mlplunit tests: membership returns
 scalar `1`/`0`, present lookup returns `ok(value)`, missing lookup returns a
 structured `missing_field` error, and empty records are supported. The JSON
 pipeline uses `record_get(...)?`, so missing fields remain ordinary Result data.

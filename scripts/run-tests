@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+config=${MLPLUNIT_CONFIG:-"$repo_root/mlplunit.conf"}
+mlpl=${MLPL:-"$repo_root/../sw-mlpl/target/release/mlpl-repl"}
+mlplunit=${MLPLUNIT:-}
+
+if [ ! -x "$mlpl" ]; then
+  echo "mlpl-repl is not executable: $mlpl" >&2
+  echo "set MLPL=/absolute/path/to/mlpl-repl" >&2
+  exit 1
+fi
+
+if [ -z "$mlplunit" ]; then
+  mlplunit=$(command -v mlplunit 2>/dev/null || true)
+fi
+if [ -z "$mlplunit" ]; then
+  adjacent="$repo_root/../../softwarewrighter/mlplunit/bin/mlplunit"
+  if [ -x "$adjacent" ]; then
+    mlplunit=$adjacent
+  fi
+fi
+if [ -z "$mlplunit" ] || [ ! -x "$mlplunit" ]; then
+  echo "mlplunit is not executable: ${mlplunit:-not found}" >&2
+  echo "install mlplunit, add it to PATH, or set MLPLUNIT=/absolute/path/to/mlplunit" >&2
+  exit 1
+fi
+
+exec "$mlplunit" --mlpl "$mlpl" --config "$config" "$@"
