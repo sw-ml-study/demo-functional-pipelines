@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+mlpl=${MLPL:-"$repo_root/../sw-mlpl/target/debug/mlpl-repl"}
+output_file=$(mktemp "${TMPDIR:-/tmp}/functional-pipeline-blocker.XXXXXX")
+trap 'rm -f "$output_file"' EXIT HUP INT TERM
+
+[ -x "$mlpl" ] || { echo "mlpl-repl is not executable: $mlpl" >&2; exit 1; }
+if "$mlpl" --source-dir "$repo_root" "$repo_root/blockers/record_has_field.mlpl" >"$output_file" 2>&1; then
+  echo "record_has_field blocker changed: review and update the upstream contract" >&2
+  exit 1
+fi
+grep -q "expected an array value, got a string" "$output_file" || {
+  echo "record_has_field failed differently:" >&2
+  sed -n '1,20p' "$output_file" >&2
+  exit 1
+}
+echo "PASS known upstream blockers"

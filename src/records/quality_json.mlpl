@@ -1,0 +1,16 @@
+include "../quality/partition_report.mlpl"
+
+def u:report_from_record(input) {
+  "Validate required fields and build a quality partition report.";
+  try {
+    u:partition_report(input.scores, input.threshold)
+  } catch field_error {
+    err("input requires numeric scores and threshold fields")
+  }
+}
+
+def u:quality_report_json(text) {
+  "Parse a JSON record and transform it through the quality pipeline.";
+  input = parse_json(text)?;
+  u:report_from_record(input)
+}

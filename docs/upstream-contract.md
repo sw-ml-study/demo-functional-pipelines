@@ -15,6 +15,21 @@ program, expected behavior, observed behavior, and fallback assessment.
 | Pipeline composition | Feed one stage into the next | named UDF with explicit intermediate values | available |
 | Bound reusable predicate | Reuse one threshold across a branch mask | partial from `call(:u:at_least, threshold)` | available |
 | Fallible branch result | Keep invalid domain input in the value flow | `ok(...)`, `err(...)`, and records | available |
+| Safe record field validation | Distinguish a missing JSON field without raising a hard error | no `has_field(record, name)` or `record_get(record, name)` builtin; `try/catch` is the fallback | upstream opportunity |
+
+## Safe record lookup opportunity
+
+`blockers/record_has_field.mlpl` is the minimal reproducer. Run it with the same
+`$MLPL` binary used for demos; the current runtime rejects the call with
+`expected an array value, got a string`. Expected behavior is scalar `1` for an
+existing field and `0` for a missing field, or equivalently a `record_get` API
+returning `ok(value)`/`err`.
+
+This does not block known-schema transformation because `try/catch` can demote
+field access errors. It does block ordinary predicate-based schema validation
+and forces missing fields and wrong receiver types through exception control
+flow. An upstream regression should cover present, absent, empty-record, and
+non-record receivers without mutating the record.
 
 ## Blocker template
 

@@ -14,3 +14,9 @@ map-filter-reduce:
 
 branching-pipelines:
     ./scripts/run-branching-pipelines
+
+data-record-pipeline:
+    ./scripts/run-data-record-pipeline
+
+upstream-blockers:
+    ./scripts/check-upstream-blockers
