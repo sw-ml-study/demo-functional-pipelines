@@ -1,0 +1,20 @@
+# Pure stages for a small numeric map/filter/reduce pipeline.
+
+def u:double_value(x) { "Double one numeric value."; x * 2 }
+
+def u:at_least_six(values) {
+  "Return a mask selecting values greater than or equal to six.";
+  gt(values, 6) + eq(values, 6)
+}
+
+def u:sum_or_zero(values) {
+  "Reduce values with addition, using zero as the empty-input identity.";
+  if eq(tally(values), 0) { 0 } else { reduce(:add, values) }
+}
+
+def u:double_select_sum(values) {
+  "Double values, retain results at least six, then sum them.";
+  mapped = each(:u:double_value, values);
+  selected = compress(u:at_least_six(mapped), mapped);
+  u:sum_or_zero(selected)
+}

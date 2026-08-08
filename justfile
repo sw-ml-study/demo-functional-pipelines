@@ -8,3 +8,6 @@ check:
 
 audit:
     ./scripts/validate-catalog catalog/demos.tsv
+
+map-filter-reduce:
+    ./scripts/run-map-filter-reduce

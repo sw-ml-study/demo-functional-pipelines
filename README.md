@@ -15,6 +15,9 @@ Install [`just`](https://just.systems/), then run `just check`. Executable
 recipes use `../sw-mlpl/target/debug/mlpl-repl` by default; set
 `MLPL=/absolute/path/to/mlpl-repl` to select another build.
 
+Start with `just map-filter-reduce`, which demonstrates eager mapping,
+predicate selection, and reduction with explicit empty-input behavior.
+
 ## Repository map
 
 ```text

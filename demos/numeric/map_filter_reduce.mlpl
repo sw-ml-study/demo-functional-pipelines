@@ -1,0 +1,24 @@
+include "../../src/numeric/map_filter_reduce.mlpl"
+
+def u:check(condition, label) {
+  "Return one for a true invariant or a labelled Result error.";
+  if condition { 1 } else { err(label) }
+}
+
+empty_result = u:double_select_sum([])
+singleton_below = u:double_select_sum([2])
+singleton_boundary = u:double_select_sum([3])
+duplicate_result = u:double_select_sum([-3, 0, 1, 3, 3])
+
+checks = [
+  u:check(equal(empty_result, 0), "empty input uses the additive identity"),
+  u:check(equal(singleton_below, 0), "a below-boundary singleton is filtered"),
+  u:check(equal(singleton_boundary, 6), "the inclusive boundary is retained"),
+  u:check(equal(duplicate_result, 12), "duplicates are transformed and retained")
+]
+
+if equal(checks, [1, 1, 1, 1]) {
+  ok({empty: empty_result, below: singleton_below, boundary: singleton_boundary, duplicates: duplicate_result})
+} else {
+  err("map/filter/reduce invariant failed")
+}

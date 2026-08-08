@@ -1,6 +1,6 @@
 number = 2
 slug = "map-filter-reduce"
-status = "pending"
+status = "in-progress"
 description = "Using the selected adjacent sw-MLPL development binary, first inspect shipped..."
 role = "production"
 context_files = []

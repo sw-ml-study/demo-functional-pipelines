@@ -9,10 +9,10 @@ program, expected behavior, observed behavior, and fallback assessment.
 | Capability | Demo need | Current route | Status |
 |---|---|---|---|
 | First-class named functions | Reusable stages | sw-MLPL UDFs | available |
-| Array transformation | Transform without mutation | array primitives/combinators | verify in first executable slice |
-| Predicate selection | Retain matching values | array primitives/combinators | verify in first executable slice |
-| Left reduction | Collapse with an accumulator | array primitives/combinators | verify in first executable slice |
-| Pipeline composition | Feed one stage into the next | UDF calls and shipped composition forms | verify in first executable slice |
+| Array transformation | Transform without mutation | `each(:u:fn, values)` | available |
+| Predicate selection | Retain matching values | `compress(mask, values)` | available |
+| Left reduction | Collapse with an accumulator | `reduce(:add, values)` plus an explicit empty identity | available |
+| Pipeline composition | Feed one stage into the next | named UDF with explicit intermediate values | available |
 
 ## Blocker template
 
