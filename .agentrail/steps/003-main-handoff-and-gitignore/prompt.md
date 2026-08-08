@@ -1,0 +1,1 @@
+Keep the completed copyright/license work on main. Review and, if needed, correct this repository's .gitignore using relevant sibling conventions. Preserve the completed AgentRail metadata, run just check, commit all scoped changes with a detailed message, and push main using git only; do not use gh.

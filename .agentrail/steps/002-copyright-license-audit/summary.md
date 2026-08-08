@@ -1,0 +1,1 @@
+Audited all sibling repositories active on 2026-08-07 or 2026-08-08, excluded the wiki special case, identified demo-combinators as the sole sibling README gap, and changed only this repository by adding matching 2026 Michael A Wright copyright and MIT license notices plus regression checks. just check passes. Commit 67c5d78 is local and not yet pushed.

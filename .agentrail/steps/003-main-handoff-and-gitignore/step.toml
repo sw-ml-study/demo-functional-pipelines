@@ -1,0 +1,8 @@
+number = 3
+slug = "main-handoff-and-gitignore"
+status = "in-progress"
+description = "Keep the completed copyright/license work on main. Review and, if needed, cor..."
+role = "production"
+context_files = []
+created_at = "2026-08-08T10:53:42"
+commits = []
