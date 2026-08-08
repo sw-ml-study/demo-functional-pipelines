@@ -1,8 +1,9 @@
 number = 6
 slug = "release-audit"
-status = "in-progress"
+status = "completed"
 description = "Perform the saga release audit. Verify every runnable catalog row is executed..."
 role = "validation"
 context_files = []
 created_at = "2026-08-07T19:48:40"
-commits = []
+completed_at = "2026-08-07T19:51:27"
+commits = ["5ed0bb95e57fd2a3cfcdf32e25b8f58f055de24f"]
