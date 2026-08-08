@@ -1,8 +1,9 @@
 number = 4
 slug = "data-record-pipeline"
-status = "in-progress"
+status = "completed"
 description = "Build a realistic record-oriented pipeline using shipped parse_json, record a..."
 role = "production"
 context_files = []
 created_at = "2026-08-07T19:40:19"
-commits = []
+completed_at = "2026-08-07T19:46:00"
+commits = ["8379c17f8ab181717a895f4a46c972bc36f8cd16"]
