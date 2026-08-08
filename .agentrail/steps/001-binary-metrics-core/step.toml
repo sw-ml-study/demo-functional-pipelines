@@ -1,8 +1,9 @@
 number = 1
 slug = "binary-metrics-core"
-status = "in-progress"
+status = "completed"
 description = "Implement the pure numeric core of a realistic binary-classifier evaluation a..."
 role = "production"
 context_files = []
 created_at = "2026-08-07T20:46:50"
-commits = []
+completed_at = "2026-08-07T20:51:21"
+commits = ["ffa14bdbbaddb8deb208a2b2f78824525b8983a1"]

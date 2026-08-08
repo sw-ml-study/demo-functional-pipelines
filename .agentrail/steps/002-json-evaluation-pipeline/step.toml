@@ -1,0 +1,8 @@
+number = 2
+slug = "json-evaluation-pipeline"
+status = "pending"
+description = "Add a fallible JSON entry point around the shipped binary metrics core. Parse..."
+role = "production"
+context_files = []
+created_at = "2026-08-07T20:51:21"
+commits = []
