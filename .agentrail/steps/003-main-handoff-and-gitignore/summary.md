@@ -1,0 +1,1 @@
+Kept the copyright/license fix on main, reviewed .gitignore against active sibling demo repositories and found it already sane and comprehensive, reran just check successfully, and prepared main for a git-only push.

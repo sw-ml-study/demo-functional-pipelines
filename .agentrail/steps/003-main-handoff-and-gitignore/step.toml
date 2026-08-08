@@ -1,8 +1,9 @@
 number = 3
 slug = "main-handoff-and-gitignore"
-status = "in-progress"
+status = "completed"
 description = "Keep the completed copyright/license work on main. Review and, if needed, cor..."
 role = "production"
 context_files = []
 created_at = "2026-08-08T10:53:42"
-commits = []
+completed_at = "2026-08-08T10:54:43"
+commits = ["15b493e1fac810a3b26ceb8d93238b0e8b02b287"]
