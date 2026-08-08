@@ -1,6 +1,6 @@
 number = 3
 slug = "application-release-audit"
-status = "pending"
+status = "in-progress"
 description = "Perform the classifier application release audit. Make the realistic JSON cla..."
 role = "validation"
 context_files = []
