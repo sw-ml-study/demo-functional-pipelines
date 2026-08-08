@@ -2,10 +2,11 @@
 set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-sh -n "$repo_root/scripts/check" "$repo_root/scripts/check-upstream-blockers" "$repo_root/scripts/run-branching-pipelines" "$repo_root/scripts/run-data-record-pipeline" "$repo_root/scripts/run-map-filter-reduce" "$repo_root/scripts/validate-catalog"
+sh -n "$repo_root/scripts/check" "$repo_root/scripts/check-upstream-blockers" "$repo_root/scripts/run-branching-pipelines" "$repo_root/scripts/run-composition-comparison" "$repo_root/scripts/run-data-record-pipeline" "$repo_root/scripts/run-map-filter-reduce" "$repo_root/scripts/validate-catalog"
 "$repo_root/scripts/validate-catalog" "$repo_root/catalog/demos.tsv"
 "$repo_root/scripts/check-upstream-blockers" >/dev/null
 "$repo_root/scripts/run-branching-pipelines" >/dev/null
+"$repo_root/scripts/run-composition-comparison" >/dev/null
 "$repo_root/scripts/run-data-record-pipeline" >/dev/null
 "$repo_root/scripts/run-map-filter-reduce" >/dev/null
 test -s "$repo_root/docs/upstream-contract.md"

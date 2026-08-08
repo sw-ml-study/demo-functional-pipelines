@@ -12,9 +12,24 @@ def u:sum_or_zero(values) {
   if eq(tally(values), 0) { 0 } else { reduce(:add, values) }
 }
 
+def u:map_double(values) {
+  "Apply the reusable doubling stage to every value.";
+  each(:u:double_value, values)
+}
+
+def u:select_at_least_six(values) {
+  "Retain values meeting the reusable inclusive predicate.";
+  compress(u:at_least_six(values), values)
+}
+
+def u:select_sum(values) {
+  "Select values at least six, then reduce with the empty identity.";
+  u:sum_or_zero(u:select_at_least_six(values))
+}
+
 def u:double_select_sum(values) {
   "Double values, retain results at least six, then sum them.";
-  mapped = each(:u:double_value, values);
-  selected = compress(u:at_least_six(mapped), mapped);
+  mapped = u:map_double(values);
+  selected = u:select_at_least_six(mapped);
   u:sum_or_zero(selected)
 }

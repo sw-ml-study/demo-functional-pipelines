@@ -1,0 +1,36 @@
+include "../../src/numeric/map_filter_reduce.mlpl"
+
+def u:direct_nested(values) {
+  "Express the complete transformation as nested right-to-left calls.";
+  u:sum_or_zero(u:select_at_least_six(u:map_double(values)))
+}
+
+def u:immediate_atop(values) {
+  "Express the complete transformation with shipped immediate composition.";
+  atop(:u:select_sum, :u:map_double, values)
+}
+
+def u:add_totals(left, right) { "Combine two scalar pipeline results."; left + right }
+
+def u:styles_agree(values) {
+  "Compare nested, named, and immediate composition results.";
+  nested = u:direct_nested(values);
+  named = u:double_select_sum(values);
+  immediate = u:immediate_atop(values);
+  equal([nested, named, immediate], [named, named, named])
+}
+
+checks = [
+  u:styles_agree([]),
+  u:styles_agree([2]),
+  u:styles_agree([3]),
+  u:styles_agree([-3, 0, 1, 3, 3])
+]
+
+combined = over(:u:add_totals, :u:double_select_sum, [3], [2, 3, 3])
+
+if equal(checks, [1, 1, 1, 1]) + equal(combined, 18) - 1 {
+  ok({equivalent_cases: reduce(:add, checks), over_total: combined})
+} else {
+  err("composition styles diverged")
+}

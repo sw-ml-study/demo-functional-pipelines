@@ -20,6 +20,8 @@ predicate selection, and reduction with explicit empty-input behavior.
 Then run `just branching-pipelines` for callable partial application, immutable
 partition branches, shared summarization, and Result-valued validation.
 `just data-record-pipeline` adds fallible JSON parsing and record validation.
+`just composition-comparison` contrasts nesting, named stages, `atop`, and
+`over` while checking that the results agree.
 
 ## Repository map
 

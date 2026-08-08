@@ -20,3 +20,6 @@ data-record-pipeline:
 
 upstream-blockers:
     ./scripts/check-upstream-blockers
+
+composition-comparison:
+    ./scripts/run-composition-comparison
