@@ -1,3 +1,0 @@
-# Upstream reproducer: safe record membership is not an MLPL builtin.
-record = {scores: [70], threshold: 70}
-has_field(record, "scores")

@@ -9,7 +9,7 @@ check:
 audit:
     ./scripts/audit-repository
     ./scripts/validate-catalog catalog/demos.tsv
-    ./scripts/check-upstream-blockers
+    ./scripts/test-record-lookup
 
 demos:
     ./scripts/run-all
@@ -23,8 +23,8 @@ branching-pipelines:
 data-record-pipeline:
     ./scripts/run-data-record-pipeline
 
-upstream-blockers:
-    ./scripts/check-upstream-blockers
+record-lookup:
+    ./scripts/test-record-lookup
 
 composition-comparison:
     ./scripts/run-composition-comparison

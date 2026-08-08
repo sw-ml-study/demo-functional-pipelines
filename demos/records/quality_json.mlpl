@@ -10,15 +10,16 @@ invalid_field = u:quality_report_json("{\"scores\":\"high\",\"threshold\":70}")
 expected_empty = ok({accepted: {count: 0, total: 0}, rejected: {count: 0, total: 0}})
 expected_singleton = ok({accepted: {count: 1, total: 70}, rejected: {count: 0, total: 0}})
 expected_duplicates = ok({accepted: {count: 3, total: 235}, rejected: {count: 1, total: 40}})
-field_error = err("input requires numeric scores and threshold fields")
+missing_error = err({available: "scores", field: "threshold", kind: "missing_field", message: "no field `threshold` (present: scores)"})
+type_error = err("scores and threshold fields must be numeric")
 
 checks = [
   equal(empty, expected_empty),
   equal(singleton, expected_singleton),
   equal(duplicates, expected_duplicates),
   1 - is_ok(malformed),
-  equal(missing, field_error),
-  equal(invalid_field, field_error)
+  equal(missing, missing_error),
+  equal(invalid_field, type_error)
 ]
 
 if equal(checks, [1, 1, 1, 1, 1, 1]) {

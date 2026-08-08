@@ -1,0 +1,8 @@
+number = 1
+slug = "adopt-record-lookup"
+status = "in-progress"
+description = "Verify has_field(record, name) and record_get(record, name) against the selec..."
+role = "production"
+context_files = []
+created_at = "2026-08-07T20:42:01"
+commits = []

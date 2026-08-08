@@ -7,9 +7,10 @@ The record pipeline parses a JSON quality batch, safely obtains its `scores` and
 JSON text -> parse_json -> validate record fields -> partition -> summarize
 ```
 
-Run `just data-record-pipeline`. Parsing failures remain `err(...)` values via
-postfix `?`. Missing fields and incompatible field types are hard runtime errors,
-so `u:report_from_record` uses `try/catch` to demote them into a stable Result.
+Run `just data-record-pipeline`. Parsing failures and missing fields remain
+`err(...)` values through `parse_json(...)?` and `record_get(...)?`. Retrieved
+values can still have incompatible domain types, so `u:report_from_record` uses
+`try/catch` only to demote those numeric-operation errors into a stable Result.
 The executable covers an empty batch, a boundary singleton, duplicates,
 malformed JSON, a missing field, and an invalid field type.
 
@@ -21,6 +22,5 @@ pipeline then eagerly materializes a mask and two partition arrays, so logical
 work and intermediate storage are linear in the score count. There are zero
 explicit loops in the demo.
 
-The runtime has no safe record-membership or field-lookup builtin. Consequently,
-schema validation currently uses exception control flow; see the minimized
-`blockers/record_has_field.mlpl` reproducer and the upstream contract.
+`has_field` and `record_get` provide exception-free schema access. See
+`tests/record_lookup.mlpl` for the executable downstream acceptance contract.

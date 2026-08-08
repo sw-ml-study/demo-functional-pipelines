@@ -1,10 +1,5 @@
-# Functional Pipelines Demo
+# Record Lookup Adoption
 
-Vision: demonstrate readable, deterministic functional data pipelines in sw-MLPL, inspired by Ramda while emphasizing compiler-visible composition and honest runtime boundaries.
+Vision: adopt shipped exception-free record lookup in the JSON pipeline and turn the former blocker into positive downstream acceptance coverage.
 
-1. **bootstrap-contract** — Establish repository instructions, just-based validation, catalog conventions, and an executable upstream-capability contract.
-2. **map-filter-reduce** — Ship a self-checking pipeline that composes mapping, filtering, and reduction over boundary cases.
-3. **branching-pipelines** — Demonstrate reusable predicates and converging/branching transformations without hidden mutation.
-4. **data-record-pipeline** — Demonstrate a realistic record-oriented transformation if shipped value semantics support it; otherwise capture a minimized upstream blocker.
-5. **composition-comparison** — Add an educational comparison between direct nesting and named functional pipelines, including limitations and complexity.
-6. **release-audit** — Run the complete catalog, documentation, and executable audit; reconcile blockers and finish the saga.
+1. **adopt-record-lookup** — Verify has_field and record_get, refactor schema validation, retire blocker expectations, update documentation and gates, and complete the focused saga.

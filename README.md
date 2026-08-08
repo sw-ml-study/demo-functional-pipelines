@@ -12,17 +12,18 @@ minimized request in [the upstream contract](docs/upstream-contract.md).
 ## Run and verify
 
 Install [`just`](https://just.systems/), then run `just check`. Executable
-recipes use `../sw-mlpl/target/debug/mlpl-repl` by default; set
+recipes use `../sw-mlpl/target/release/mlpl-repl` by default; set
 `MLPL=/absolute/path/to/mlpl-repl` to select another build.
 
 `just demos` executes every runnable catalog row. `just audit` validates the
-repository structure, catalog, documentation links, and known upstream blockers.
+repository structure, catalog, documentation links, and record-lookup contract.
 
 Start with `just map-filter-reduce`, which demonstrates eager mapping,
 predicate selection, and reduction with explicit empty-input behavior.
 Then run `just branching-pipelines` for callable partial application, immutable
 partition branches, shared summarization, and Result-valued validation.
 `just data-record-pipeline` adds fallible JSON parsing and record validation.
+`just record-lookup` pins exception-free `has_field` and `record_get` behavior.
 `just composition-comparison` contrasts nesting, named stages, `atop`, and
 `over` while checking that the results agree.
 

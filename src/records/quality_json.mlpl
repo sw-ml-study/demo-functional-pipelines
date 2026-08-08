@@ -2,10 +2,12 @@ include "../quality/partition_report.mlpl"
 
 def u:report_from_record(input) {
   "Validate required fields and build a quality partition report.";
+  scores = record_get(input, "scores")?;
+  threshold = record_get(input, "threshold")?;
   try {
-    u:partition_report(input.scores, input.threshold)
-  } catch field_error {
-    err("input requires numeric scores and threshold fields")
+    u:partition_report(scores, threshold)
+  } catch type_error {
+    err("scores and threshold fields must be numeric")
   }
 }
 
