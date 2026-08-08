@@ -1,0 +1,8 @@
+number = 6
+slug = "release-audit"
+status = "pending"
+description = "Perform the saga release audit. Verify every runnable catalog row is executed..."
+role = "validation"
+context_files = []
+created_at = "2026-08-07T19:48:40"
+commits = []

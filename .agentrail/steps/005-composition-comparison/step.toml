@@ -1,8 +1,9 @@
 number = 5
 slug = "composition-comparison"
-status = "in-progress"
+status = "completed"
 description = "Add an educational executable comparison showing the same transformation expr..."
 role = "production"
 context_files = []
 created_at = "2026-08-07T19:46:00"
-commits = []
+completed_at = "2026-08-07T19:48:40"
+commits = ["dfacd3185fac8249a99a3dddb07bf91dbda2728b"]
