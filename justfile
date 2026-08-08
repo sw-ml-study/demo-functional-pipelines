@@ -28,3 +28,6 @@ record-lookup:
 
 composition-comparison:
     ./scripts/run-composition-comparison
+
+binary-metrics:
+    ./scripts/run-binary-metrics

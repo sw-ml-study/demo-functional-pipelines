@@ -26,6 +26,8 @@ partition branches, shared summarization, and Result-valued validation.
 `just record-lookup` pins exception-free `has_field` and `record_get` behavior.
 `just composition-comparison` contrasts nesting, named stages, `atop`, and
 `over` while checking that the results agree.
+`just binary-metrics` runs the numeric core of a realistic binary-classifier
+evaluation application from logits through confusion counts and metrics.
 
 ## Repository map
 

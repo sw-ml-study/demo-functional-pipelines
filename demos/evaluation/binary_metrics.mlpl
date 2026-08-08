@@ -1,0 +1,35 @@
+include "../../src/evaluation/binary_metrics.mlpl"
+
+empty = u:evaluate_binary_logits([], [], 0.5)
+positive_boundary = u:evaluate_binary_logits([0], [1], 0.5)
+negative_singleton = u:evaluate_binary_logits([0], [0], 0.6)
+duplicates_all_positive = u:evaluate_binary_logits([0, 0, 2, 2], [1, 0, 1, 0], 0.5)
+all_negative = u:evaluate_binary_logits([-10, -10], [1, 0], 0.5)
+bad_shape = u:evaluate_binary_logits([0, 1], [1], 0.5)
+bad_label = u:evaluate_binary_logits([0], [2], 0.5)
+bad_threshold = u:evaluate_binary_logits([0], [1], 1.1)
+bad_rank = u:evaluate_binary_logits(0, 1, 0.5)
+
+zero_counts = {fn: 0, fp: 0, tn: 0, tp: 0}
+positive_counts = {fn: 0, fp: 0, tn: 0, tp: 1}
+negative_counts = {fn: 0, fp: 0, tn: 1, tp: 0}
+duplicate_counts = {fn: 0, fp: 2, tn: 0, tp: 2}
+all_negative_counts = {fn: 1, fp: 0, tn: 1, tp: 0}
+
+checks = [
+  equal(empty, ok({accuracy: 0, counts: zero_counts, precision: 0, recall: 0, total: 0})),
+  equal(positive_boundary, ok({accuracy: 1, counts: positive_counts, precision: 1, recall: 1, total: 1})),
+  equal(negative_singleton, ok({accuracy: 1, counts: negative_counts, precision: 0, recall: 0, total: 1})),
+  equal(duplicates_all_positive, ok({accuracy: 0.5, counts: duplicate_counts, precision: 0.5, recall: 1, total: 4})),
+  equal(all_negative, ok({accuracy: 0.5, counts: all_negative_counts, precision: 0, recall: 0, total: 2})),
+  equal(bad_shape, err("logits and labels must have the same shape")),
+  equal(bad_label, err("labels must contain only 0 and 1")),
+  equal(bad_threshold, err("threshold must be between 0 and 1")),
+  equal(bad_rank, err("logits and labels must be rank-1 arrays"))
+]
+
+if equal(checks, [1, 1, 1, 1, 1, 1, 1, 1, 1]) {
+  ok({cases: reduce(:add, checks), boundary: positive_boundary, duplicates: duplicates_all_positive})
+} else {
+  err("binary metrics invariant failed")
+}

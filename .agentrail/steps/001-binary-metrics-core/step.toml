@@ -1,0 +1,8 @@
+number = 1
+slug = "binary-metrics-core"
+status = "in-progress"
+description = "Implement the pure numeric core of a realistic binary-classifier evaluation a..."
+role = "production"
+context_files = []
+created_at = "2026-08-07T20:46:50"
+commits = []

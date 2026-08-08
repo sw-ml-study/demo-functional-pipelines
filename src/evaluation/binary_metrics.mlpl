@@ -1,0 +1,65 @@
+# Pure stages for evaluating binary-classifier logits.
+
+def u:sum_or_zero_metrics(values) {
+  "Sum an array with zero as the empty-input identity.";
+  if eq(tally(values), 0) { 0 } else { reduce(:add, values) }
+}
+
+def u:sigmoid_probabilities(logits) {
+  "Transform logits into probabilities without mutation.";
+  1 / (1 + exp(0 - logits))
+}
+
+def u:threshold_predictions(probabilities, threshold) {
+  "Classify probabilities using an inclusive decision threshold.";
+  gt(probabilities, threshold) + eq(probabilities, threshold)
+}
+
+def u:binary_labels_valid(labels) {
+  "Return one when every label is exactly zero or one.";
+  valid = eq(labels, 0) + eq(labels, 1);
+  eq(u:sum_or_zero_metrics(valid), tally(labels))
+}
+
+def u:confusion_counts(predictions, labels) {
+  "Count true/false positives and negatives from binary arrays.";
+  positives = labels;
+  negatives = 1 - labels;
+  predicted_positive = predictions;
+  predicted_negative = 1 - predictions;
+  {tp: u:sum_or_zero_metrics(predicted_positive * positives), fp: u:sum_or_zero_metrics(predicted_positive * negatives), tn: u:sum_or_zero_metrics(predicted_negative * negatives), fn: u:sum_or_zero_metrics(predicted_negative * positives)}
+}
+
+def u:safe_metric_ratio(numerator, denominator) {
+  "Divide metrics, returning zero when the denominator is zero.";
+  if eq(denominator, 0) { 0 } else { numerator / denominator }
+}
+
+def u:metrics_report(counts) {
+  "Derive accuracy, precision, and recall from confusion counts.";
+  total = counts.tp + counts.fp + counts.tn + counts.fn;
+  {counts: counts, total: total, accuracy: u:safe_metric_ratio(counts.tp + counts.tn, total), precision: u:safe_metric_ratio(counts.tp, counts.tp + counts.fp), recall: u:safe_metric_ratio(counts.tp, counts.tp + counts.fn)}
+}
+
+def u:evaluate_binary_logits(logits, labels, threshold) {
+  "Validate binary evaluation inputs and return a metrics report Result.";
+  if 1 - eq(rank(logits), 1) * eq(rank(labels), 1) {
+    err("logits and labels must be rank-1 arrays")
+  } else {
+    if 1 - equal(shape(logits), shape(labels)) {
+      err("logits and labels must have the same shape")
+    } else {
+      if gt(0, threshold) + gt(threshold, 1) {
+        err("threshold must be between 0 and 1")
+      } else {
+        if u:binary_labels_valid(labels) {
+          probabilities = u:sigmoid_probabilities(logits);
+          predictions = u:threshold_predictions(probabilities, threshold);
+          ok(u:metrics_report(u:confusion_counts(predictions, labels)))
+        } else {
+          err("labels must contain only 0 and 1")
+        }
+      }
+    }
+  }
+}

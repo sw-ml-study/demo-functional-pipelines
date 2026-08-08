@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+mlpl=${MLPL:-"$repo_root/../sw-mlpl/target/release/mlpl-repl"}
+
+[ -x "$mlpl" ] || { echo "mlpl-repl is not executable: $mlpl" >&2; exit 1; }
+exec "$mlpl" --source-dir "$repo_root" "$repo_root/demos/evaluation/binary_metrics.mlpl"
