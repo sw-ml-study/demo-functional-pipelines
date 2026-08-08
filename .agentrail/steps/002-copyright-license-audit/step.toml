@@ -1,0 +1,8 @@
+number = 2
+slug = "copyright-license-audit"
+status = "in-progress"
+description = "Inspect recently active sibling repositories read-only to determine the preva..."
+role = "production"
+context_files = []
+created_at = "2026-08-08T10:47:42"
+commits = []

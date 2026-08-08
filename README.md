@@ -67,3 +67,9 @@ scripts/validate-catalog   catalog schema and path audit
 
 See [future work](docs/future-work.md) for prioritized applications, testing
 adoption, conditional language opportunities, and acceptance criteria.
+
+## Copyright and license
+
+Copyright (c) 2026 Michael A Wright. See [COPYRIGHT](COPYRIGHT).
+
+This project is available under the [MIT License](LICENSE).
