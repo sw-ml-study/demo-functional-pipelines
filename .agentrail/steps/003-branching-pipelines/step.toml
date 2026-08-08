@@ -1,0 +1,8 @@
+number = 3
+slug = "branching-pipelines"
+status = "pending"
+description = "Inspect shipped callable, partial-application, atop/over, record, and Result ..."
+role = "production"
+context_files = []
+created_at = "2026-08-07T19:33:58"
+commits = []

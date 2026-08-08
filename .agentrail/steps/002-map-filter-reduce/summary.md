@@ -1,0 +1,1 @@
+Added and documented a deterministic map/filter/reduce pipeline using shipped each, compress, and reduce semantics. Covered empty, singleton, inclusive-boundary, negative, and duplicate inputs; recorded eager allocation costs and marked the probed upstream capabilities available. Commit 51f43cc; just map-filter-reduce and just check passed with sw-MLPL 0.20.0 build 797037e1.
