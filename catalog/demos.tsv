@@ -1,2 +1,3 @@
 id	path	concept	dynamic_size	explicit_loops	required_features	status
 map-filter-reduce	demos/numeric/map_filter_reduce.mlpl	map-filter-reduce	yes	0	each,compress,reduce	runnable
+branching-pipelines	demos/quality/partition_report.mlpl	branch-converge	yes	0	partial,each,compress,result,record	runnable

@@ -17,6 +17,8 @@ recipes use `../sw-mlpl/target/debug/mlpl-repl` by default; set
 
 Start with `just map-filter-reduce`, which demonstrates eager mapping,
 predicate selection, and reduction with explicit empty-input behavior.
+Then run `just branching-pipelines` for callable partial application, immutable
+partition branches, shared summarization, and Result-valued validation.
 
 ## Repository map
 

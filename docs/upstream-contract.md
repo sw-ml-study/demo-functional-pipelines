@@ -13,6 +13,8 @@ program, expected behavior, observed behavior, and fallback assessment.
 | Predicate selection | Retain matching values | `compress(mask, values)` | available |
 | Left reduction | Collapse with an accumulator | `reduce(:add, values)` plus an explicit empty identity | available |
 | Pipeline composition | Feed one stage into the next | named UDF with explicit intermediate values | available |
+| Bound reusable predicate | Reuse one threshold across a branch mask | partial from `call(:u:at_least, threshold)` | available |
+| Fallible branch result | Keep invalid domain input in the value flow | `ok(...)`, `err(...)`, and records | available |
 
 ## Blocker template
 

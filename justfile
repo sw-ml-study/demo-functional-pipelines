@@ -11,3 +11,6 @@ audit:
 
 map-filter-reduce:
     ./scripts/run-map-filter-reduce
+
+branching-pipelines:
+    ./scripts/run-branching-pipelines

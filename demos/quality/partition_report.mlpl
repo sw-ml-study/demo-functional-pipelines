@@ -1,0 +1,28 @@
+include "../../src/quality/partition_report.mlpl"
+
+empty = u:partition_report([], 70)
+singleton_below = u:partition_report([69], 70)
+singleton_boundary = u:partition_report([70], 70)
+duplicates = u:partition_report([40, 70, 70, 95], 70)
+invalid_threshold = u:partition_report([70], 101)
+invalid_score = u:partition_report([101], 70)
+
+expected_empty = ok({accepted: {count: 0, total: 0}, rejected: {count: 0, total: 0}})
+expected_below = ok({accepted: {count: 0, total: 0}, rejected: {count: 1, total: 69}})
+expected_boundary = ok({accepted: {count: 1, total: 70}, rejected: {count: 0, total: 0}})
+expected_duplicates = ok({accepted: {count: 3, total: 235}, rejected: {count: 1, total: 40}})
+
+checks = [
+  equal(empty, expected_empty),
+  equal(singleton_below, expected_below),
+  equal(singleton_boundary, expected_boundary),
+  equal(duplicates, expected_duplicates),
+  equal(invalid_threshold, err("threshold must be between 0 and 100")),
+  equal(invalid_score, err("scores must be between 0 and 100"))
+]
+
+if equal(checks, [1, 1, 1, 1, 1, 1]) {
+  ok({empty: empty, boundary: singleton_boundary, duplicates: duplicates})
+} else {
+  err("branching pipeline invariant failed")
+}

@@ -1,6 +1,6 @@
 number = 3
 slug = "branching-pipelines"
-status = "pending"
+status = "in-progress"
 description = "Inspect shipped callable, partial-application, atop/over, record, and Result ..."
 role = "production"
 context_files = []

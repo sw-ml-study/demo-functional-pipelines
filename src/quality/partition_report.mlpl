@@ -1,0 +1,39 @@
+# Pure branching pipeline for partitioning and summarizing quality scores.
+
+def u:at_least(threshold, value) {
+  "Return one when value meets an inclusive threshold.";
+  gt(value, threshold) + eq(value, threshold)
+}
+
+def u:sum_scores(values) {
+  "Sum scores with zero as the empty branch identity.";
+  if eq(tally(values), 0) { 0 } else { reduce(:add, values) }
+}
+
+def u:summarize_scores(values) {
+  "Describe one score branch without mutating the input.";
+  {count: tally(values), total: u:sum_scores(values)}
+}
+
+def u:scores_valid(scores) {
+  "Accept scores in the inclusive zero-to-one-hundred range.";
+  invalid = gt(0, scores) + gt(scores, 100);
+  eq(u:sum_scores(invalid), 0)
+}
+
+def u:partition_report(scores, threshold) {
+  "Partition valid scores at threshold and summarize both branches.";
+  if gt(0, threshold) + gt(threshold, 100) {
+    err("threshold must be between 0 and 100")
+  } else {
+    if u:scores_valid(scores) {
+      predicate = call(:u:at_least, threshold);
+      accepted_mask = each(predicate, scores);
+      accepted = compress(accepted_mask, scores);
+      rejected = compress(1 - accepted_mask, scores);
+      ok({accepted: u:summarize_scores(accepted), rejected: u:summarize_scores(rejected)})
+    } else {
+      err("scores must be between 0 and 100")
+    }
+  }
+}
