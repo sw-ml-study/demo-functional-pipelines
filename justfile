@@ -31,3 +31,6 @@ composition-comparison:
 
 binary-metrics:
     ./scripts/run-binary-metrics
+
+classifier-evaluation:
+    ./scripts/run-classifier-evaluation

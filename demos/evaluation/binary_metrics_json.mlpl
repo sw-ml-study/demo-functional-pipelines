@@ -1,0 +1,48 @@
+include "../../src/evaluation/binary_metrics_json.mlpl"
+
+valid = u:evaluate_binary_json("{\"logits\":[-2,0,2,1],\"labels\":[0,1,1,0],\"threshold\":0.5}")
+empty = u:evaluate_binary_json("{\"logits\":[],\"labels\":[],\"threshold\":0.5}")
+boundary = u:evaluate_binary_json("{\"logits\":[0],\"labels\":[1],\"threshold\":0.5}")
+malformed = u:evaluate_binary_json("{\"logits\":[0]")
+missing_logits = u:evaluate_binary_json("{\"labels\":[1],\"threshold\":0.5}")
+missing_labels = u:evaluate_binary_json("{\"logits\":[0],\"threshold\":0.5}")
+missing_threshold = u:evaluate_binary_json("{\"logits\":[0],\"labels\":[1]}")
+bad_shape = u:evaluate_binary_json("{\"logits\":[0,1],\"labels\":[1],\"threshold\":0.5}")
+bad_label = u:evaluate_binary_json("{\"logits\":[0],\"labels\":[2],\"threshold\":0.5}")
+bad_threshold = u:evaluate_binary_json("{\"logits\":[0],\"labels\":[1],\"threshold\":2}")
+bad_logits_type = u:evaluate_binary_json("{\"logits\":\"high\",\"labels\":[1],\"threshold\":0.5}")
+bad_labels_type = u:evaluate_binary_json("{\"logits\":[0],\"labels\":\"yes\",\"threshold\":0.5}")
+bad_threshold_type = u:evaluate_binary_json("{\"logits\":[0],\"labels\":[1],\"threshold\":\"half\"}")
+
+valid_counts = {fn: 0, fp: 1, tn: 1, tp: 2}
+zero_counts = {fn: 0, fp: 0, tn: 0, tp: 0}
+boundary_counts = {fn: 0, fp: 0, tn: 0, tp: 1}
+expected_valid = ok({accuracy: 0.75, counts: valid_counts, precision: 2 / 3, recall: 1, total: 4})
+expected_empty = ok({accuracy: 0, counts: zero_counts, precision: 0, recall: 0, total: 0})
+expected_boundary = ok({accuracy: 1, counts: boundary_counts, precision: 1, recall: 1, total: 1})
+missing_logits_error = err({available: "labels, threshold", field: "logits", kind: "missing_field", message: "no field `logits` (present: labels, threshold)"})
+missing_labels_error = err({available: "logits, threshold", field: "labels", kind: "missing_field", message: "no field `labels` (present: logits, threshold)"})
+missing_threshold_error = err({available: "labels, logits", field: "threshold", kind: "missing_field", message: "no field `threshold` (present: labels, logits)"})
+schema_type_error = err("logits and labels must be numeric arrays and threshold must be numeric")
+
+checks = [
+  equal(valid, expected_valid),
+  equal(empty, expected_empty),
+  equal(boundary, expected_boundary),
+  1 - is_ok(malformed),
+  equal(missing_logits, missing_logits_error),
+  equal(missing_labels, missing_labels_error),
+  equal(missing_threshold, missing_threshold_error),
+  equal(bad_shape, err("logits and labels must have the same shape")),
+  equal(bad_label, err("labels must contain only 0 and 1")),
+  equal(bad_threshold, err("threshold must be between 0 and 1")),
+  equal(bad_logits_type, schema_type_error),
+  equal(bad_labels_type, schema_type_error),
+  equal(bad_threshold_type, schema_type_error)
+]
+
+if equal(checks, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]) {
+  ok({cases: reduce(:add, checks), report: valid})
+} else {
+  err("JSON classifier evaluation invariant failed")
+}

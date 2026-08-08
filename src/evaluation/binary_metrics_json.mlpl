@@ -1,0 +1,19 @@
+include "binary_metrics.mlpl"
+
+def u:evaluate_binary_record(input) {
+  "Extract a classifier batch record and delegate to the numeric evaluator.";
+  try {
+    logits = record_get(input, "logits")?;
+    labels = record_get(input, "labels")?;
+    threshold = record_get(input, "threshold")?;
+    u:evaluate_binary_logits(logits, labels, threshold)
+  } catch type_error {
+    err("logits and labels must be numeric arrays and threshold must be numeric")
+  }
+}
+
+def u:evaluate_binary_json(text) {
+  "Parse a JSON classifier batch and return its metrics report Result.";
+  input = parse_json(text)?;
+  u:evaluate_binary_record(input)
+}

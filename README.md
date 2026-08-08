@@ -28,6 +28,7 @@ partition branches, shared summarization, and Result-valued validation.
 `over` while checking that the results agree.
 `just binary-metrics` runs the numeric core of a realistic binary-classifier
 evaluation application from logits through confusion counts and metrics.
+`just classifier-evaluation` runs the complete fallible JSON application.
 
 ## Repository map
 
