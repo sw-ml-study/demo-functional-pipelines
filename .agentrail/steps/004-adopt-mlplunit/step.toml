@@ -1,8 +1,9 @@
 number = 4
 slug = "adopt-mlplunit"
-status = "in-progress"
+status = "completed"
 description = "Adopt mlplunit for this repository's MLPL tests to dogfood native reporting. ..."
 role = "production"
 context_files = []
 created_at = "2026-08-08T11:08:02"
-commits = []
+completed_at = "2026-08-08T11:10:03"
+commits = ["e9d7381e1b4e3a249beb253bad01bcfe5f14c0c5"]

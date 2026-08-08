@@ -1,0 +1,1 @@
+Adopted mlplunit 0.1.0 for native MLPL test discovery and reporting, migrated record lookup into five named tests, added human/TAP/list/focused runners that honor MLPLUNIT and MLPL, retained standalone demos, updated documentation and future-work status, and passed just audit, tests, tap, list-tests, and just check.
