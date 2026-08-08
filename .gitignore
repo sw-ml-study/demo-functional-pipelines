@@ -1,0 +1,14 @@
+# macOS and editor noise
+.DS_Store
+*~
+*.swp
+
+# Local configuration, outputs, and copied build products
+.env
+.env.*
+out/
+target/
+*.svg
+
+# AgentRail session transcripts are local; durable steps and trajectories remain tracked.
+.agentrail/sessions/

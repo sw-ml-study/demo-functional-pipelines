@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+catalog=${1:-"$repo_root/catalog/demos.tsv"}
+expected=$(printf 'id\tpath\tconcept\tdynamic_size\texplicit_loops\trequired_features\tstatus')
+[ "$(sed -n '1p' "$catalog")" = "$expected" ] || { echo "invalid catalog header: $catalog" >&2; exit 1; }
+
+tab=$(printf '\t')
+while IFS="$tab" read -r id path concept dynamic_size explicit_loops required_features status extra; do
+  [ "$id" = "id" ] && continue
+  [ -z "$id" ] && continue
+  [ -z "${extra:-}" ] || { echo "extra catalog column: $id" >&2; exit 1; }
+  case "$id" in *[!a-z0-9-]*|'') echo "invalid demo id: $id" >&2; exit 1;; esac
+  case "$dynamic_size" in yes|no) :;; *) echo "invalid dynamic_size: $id" >&2; exit 1;; esac
+  case "$explicit_loops" in *[!0-9]*|'') echo "invalid explicit_loops: $id" >&2; exit 1;; esac
+  case "$status" in runnable) [ -f "$repo_root/$path" ] || { echo "missing runnable demo: $path" >&2; exit 1; };; gated) :;; *) echo "invalid status: $id" >&2; exit 1;; esac
+  [ -n "$concept" ] && [ -n "$required_features" ] || { echo "incomplete catalog row: $id" >&2; exit 1; }
+done < "$catalog"
+
+echo "PASS catalog"

@@ -1,0 +1,1 @@
+Establish repository instructions adapted from demo-memory, demo-algorithms, and sw-mlpl; add a thin justfile and deterministic validation scripts; document the executable upstream capability contract and initial demo catalog conventions. Run just check, commit all source and agentrail metadata with details, then complete the step and name the next unblocked feature.
