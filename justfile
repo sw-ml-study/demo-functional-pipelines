@@ -7,7 +7,12 @@ check:
     ./scripts/check
 
 audit:
+    ./scripts/audit-repository
     ./scripts/validate-catalog catalog/demos.tsv
+    ./scripts/check-upstream-blockers
+
+demos:
+    ./scripts/run-all
 
 map-filter-reduce:
     ./scripts/run-map-filter-reduce

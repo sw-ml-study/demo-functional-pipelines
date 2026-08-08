@@ -1,6 +1,6 @@
 number = 6
 slug = "release-audit"
-status = "pending"
+status = "in-progress"
 description = "Perform the saga release audit. Verify every runnable catalog row is executed..."
 role = "validation"
 context_files = []

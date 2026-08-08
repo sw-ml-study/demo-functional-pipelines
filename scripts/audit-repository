@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+if find "$repo_root" -maxdepth 1 -type f \( -name Makefile -o -name 'Makefile.*' \) | grep -q .; then
+  echo "Makefiles are not allowed; use justfile" >&2
+  exit 1
+fi
+
+find "$repo_root/scripts" -type f -perm -u+x -exec sh -n {} +
+
+find "$repo_root" -maxdepth 2 -type f \( -name '*.md' -o -name '*.txt' \) -print |
+while IFS= read -r document; do
+  sed -n 's/.*](\([^)#]*\)).*/\1/p' "$document" |
+  while IFS= read -r target; do
+    case "$target" in ''|http://*|https://*) continue;; esac
+    [ -e "$(dirname "$document")/$target" ] || {
+      echo "broken local link in ${document#"$repo_root/"}: $target" >&2
+      exit 1
+    }
+  done
+done
+
+echo "PASS repository audit"
