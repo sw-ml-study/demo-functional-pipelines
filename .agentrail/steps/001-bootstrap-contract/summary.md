@@ -1,0 +1,1 @@
+Bootstrapped the functional-pipelines repository with generated AgentRail instructions, peer-adapted project rules, a just-only task surface, deterministic catalog validation, and an explicit upstream capability contract. Commit 40a46a8; just check passed.

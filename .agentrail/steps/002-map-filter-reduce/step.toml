@@ -1,0 +1,8 @@
+number = 2
+slug = "map-filter-reduce"
+status = "pending"
+description = "Using the selected adjacent sw-MLPL development binary, first inspect shipped..."
+role = "production"
+context_files = []
+created_at = "2026-08-07T19:28:14"
+commits = []
