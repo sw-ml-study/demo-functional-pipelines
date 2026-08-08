@@ -1,8 +1,9 @@
 number = 3
 slug = "branching-pipelines"
-status = "in-progress"
+status = "completed"
 description = "Inspect shipped callable, partial-application, atop/over, record, and Result ..."
 role = "production"
 context_files = []
 created_at = "2026-08-07T19:33:58"
-commits = []
+completed_at = "2026-08-07T19:40:19"
+commits = ["20f7965377a4422ce142048cc8968ec6a3b2829c"]
