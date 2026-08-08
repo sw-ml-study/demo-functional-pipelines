@@ -64,3 +64,6 @@ scripts/check              pre-commit validation gate
 scripts/run-all            catalog-driven demo execution
 scripts/validate-catalog   catalog schema and path audit
 ```
+
+See [future work](docs/future-work.md) for prioritized applications, testing
+adoption, conditional language opportunities, and acceptance criteria.

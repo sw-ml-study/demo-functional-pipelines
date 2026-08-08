@@ -1,0 +1,8 @@
+number = 1
+slug = "document-future-work"
+status = "in-progress"
+description = "Create docs/future-work.md describing remaining work after the completed clas..."
+role = "meta"
+context_files = []
+created_at = "2026-08-07T21:02:27"
+commits = []

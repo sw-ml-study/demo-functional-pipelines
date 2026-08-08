@@ -1,7 +1,5 @@
-# Classifier Evaluation Application
+# Future Work Documentation
 
-Vision: demonstrate a realistic, deterministic functional application that transforms binary-classifier logits and labels into a validated metrics report through reusable sw-MLPL stages.
+Vision: provide a durable, prioritized account of remaining repository work, current limitations, dependencies, and acceptance criteria.
 
-1. **binary-metrics-core** — Implement and verify pure logits-to-confusion-matrix and metric-report stages over boundary and degenerate cases.
-2. **json-evaluation-pipeline** — Add fallible JSON parsing and schema/domain validation around the metrics core, including malformed and invalid inputs.
-3. **application-release-audit** — Complete user-facing documentation, catalog/task integration audits, complexity claims, and full repository verification.
+1. **document-future-work** — Add docs/future-work.md, link it from the README, verify claims against current sources and gates, then complete the saga.
