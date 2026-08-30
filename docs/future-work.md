@@ -14,7 +14,7 @@ current blocker.
 | 2 | Result-composition application | unblocked | `map_ok`, `and_then`, `or_else`, `record_get`, and `?` |
 | 3 | Expand mlplunit coverage | partially delivered | compatible mlplunit installation or checkout |
 | 4 | Functional record updates and lenses | conditional | audit shipped sw-MLPL record/lens semantics first |
-| 5 | Allocation and fusion evidence | partially unblocked | reproducible measurement design; compiler telemetry may require upstream work |
+| 5 | Allocation and fusion evidence | partially delivered | transducer cost accounting shipped; compiler telemetry may require upstream work |
 | 6 | Catalog and documentation maturity | unblocked | existing validation scripts |
 
 ## 1. Collection-oriented application
@@ -131,8 +131,20 @@ Acceptance criteria:
 - If compiler IR or allocation counters are unavailable, document the exact
   observation needed and provide a minimized upstream request.
 
+Delivered: `demos/transducers/transducer_cost.mlpl` asserts intermediate-cell
+counts and elements pulled deterministically, prints elapsed time for the
+whole-array, eager-stage, and transducer routes at three input sizes, and
+isolates single-element read cost as its own probe. `docs/transducers.md` records
+the numbers and refuses the fusion claim the timings do not support.
+
+Remaining: warm and batch the timing runs, and obtain direct allocation counters
+rather than counting cells the program can already see. The single-element access
+blocker in `docs/upstream-contract.md` bounds any element-at-a-time measurement
+until it is resolved.
+
 Blocker status: timing experiments are unblocked. Claims about fusion or
-allocation elimination are blocked until direct evidence is available.
+allocation elimination beyond counted intermediate cells remain blocked until
+direct telemetry is available.
 
 ## 6. Catalog and documentation maturity
 

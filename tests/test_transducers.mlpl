@@ -1,0 +1,74 @@
+include "src/transducers/core.mlpl"
+
+def u:increment(x) { "Add one to a numeric element."; x + 1 }
+def u:square(x) { "Square a numeric element."; x * x }
+def u:is_even(x) { "Report whether an element is an even integer."; eq(x - 2 * floor(x / 2), 0) }
+def u:width(text) { "Measure a string element in characters."; str_len(text) }
+def u:twice(x) { "Expand one element into two copies."; [x, x] }
+def u:small_enough(x) { "Accept elements below four, rejecting the rest."; if lt(x, 4) { ok(x) } else { err("too large") } }
+
+@test {name: "a map stage transforms every element", tags: ["transducer", "map"]}
+def u:test_map_stage() { "Verify a bound map stage rewrites each element.";
+  u:assert_eq(u:transduce(call(:u:map_t, :u:increment), :u:conj, [], [1, 2, 3]), [2, 3, 4], "map stage increments")
+}
+
+@test {name: "a filter stage keeps only matching elements", tags: ["transducer", "filter"]}
+def u:test_filter_stage() { "Verify a bound filter stage drops rejected elements.";
+  u:assert_eq(u:transduce(call(:u:filter_t, :u:is_even), :u:conj, [], [1, 2, 3, 4]), [2, 4], "filter stage selects")
+}
+
+@test {name: "composition order follows data order", tags: ["transducer", "compose"]}
+def u:test_composition_order() { "Verify comp2 feeds elements through its first argument first.";
+  increment_first = call(:u:comp2, call(:u:map_t, :u:increment), call(:u:filter_t, :u:is_even));
+  filter_first = call(:u:comp2, call(:u:filter_t, :u:is_even), call(:u:map_t, :u:increment));
+  u:assert_eq({increment_first: u:transduce(increment_first, :u:conj, [], [1, 2, 3]), filter_first: u:transduce(filter_first, :u:conj, [], [1, 2, 3])}, {increment_first: [2, 4], filter_first: [3]}, "order changes the result")
+}
+
+@test {name: "one xform serves independent sinks", tags: ["transducer", "sink"]}
+def u:test_sink_independence() { "Verify the same xform collects, sums, and counts.";
+  xform = call(:u:comp2, call(:u:filter_t, :u:is_even), call(:u:map_t, :u:square));
+  u:assert_eq([u:transduce(xform, :add, 0, range(6)), u:transduce(xform, :u:count_rf, 0, range(6))], [20, 3], "sinks agree")
+}
+
+@test {name: "one xform serves independent sources", tags: ["transducer", "source"]}
+def u:test_source_independence() { "Verify an xform runs over a string list as well as an array.";
+  xform = call(:u:comp2, call(:u:map_t, :u:width), call(:u:filter_t, :u:is_even));
+  u:assert_eq(u:transduce_list(xform, :u:conj, [], ["a", "bb", "ccc", "dddd"]), [2, 4], "string list source folds")
+}
+
+@test {name: "take stops the fold early", tags: ["transducer", "take", "reduced"]}
+def u:test_early_termination() { "Verify take reports a reduced accumulator and bounds the pulls.";
+  xform = call(:u:comp2, call(:u:filter_t, :u:is_even), :u:take_t);
+  outcome = u:transduce_counted(xform, :u:conj, {left: 2, inner: []}, range(1000));
+  u:assert_eq({taken: outcome.value.inner, pulled: outcome.pulled}, {taken: [0, 2], pulled: 3}, "two survivors cost three pulls")
+}
+
+@test {name: "an empty source returns the initial accumulator", tags: ["transducer", "empty"]}
+def u:test_empty_source() { "Verify an empty source pulls nothing and folds to init.";
+  outcome = u:transduce_counted(call(:u:map_t, :u:increment), :u:conj, [], []);
+  u:assert_eq({value: outcome.value, pulled: outcome.pulled}, {value: [], pulled: 0}, "empty source is a no-op")
+}
+
+@test {name: "the reduced envelope is recognized", tags: ["transducer", "reduced"]}
+def u:test_reduced_envelope() { "Verify only the reduced envelope reports as reduced.";
+  u:assert_eq([u:is_reduced(u:reduced(7)), u:is_reduced({left: 1}), u:is_reduced(7)], [1, 0, 0], "envelope detection is exact")
+}
+
+@test {name: "an expanding stage feeds several elements downstream", tags: ["transducer", "mapcat"]}
+def u:test_mapcat_stage() { "Verify one element can produce many without an intermediate collection.";
+  xform = call(:u:comp2, call(:u:mapcat_t, :u:twice), call(:u:filter_t, :u:is_even));
+  u:assert_eq(u:transduce(xform, :u:conj, [], [1, 2]), [2, 2], "each element expands then filters")
+}
+
+@test {name: "a failing validation stops the fold", tags: ["transducer", "result", "reduced"]}
+def u:test_validating_stage_stops() { "Verify the first err ends the fold and carries its diagnostic.";
+  outcome = u:transduce_counted(call(:u:validating_t, :u:small_enough), :u:conj, [], [1, 2, 9, 3]);
+  u:assert_eq({value: outcome.value, pulled: outcome.pulled}, {value: err("too large"), pulled: 3}, "err short-circuits like and_then")
+}
+
+@test {name: "a passing validation threads every value", tags: ["transducer", "result"]}
+def u:test_validating_stage_passes() { "Verify ok values continue downstream unwrapped.";
+  u:assert_eq(u:transduce(call(:u:validating_t, :u:small_enough), :u:conj, [], [1, 2, 3]), [1, 2, 3], "ok values flow through")
+}
+
+u:run_registered_tests()

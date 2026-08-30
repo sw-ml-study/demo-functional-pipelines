@@ -1,0 +1,92 @@
+include "../../src/transducers/core.mlpl"
+
+# One transformation, described once, then run into different SINKS, over
+# different SOURCES, and stopped early -- without rewriting the transformation.
+
+def u:increment(x) { "Add one to a numeric element."; x + 1 }
+def u:square(x) { "Square a numeric element."; x * x }
+def u:is_even(x) { "Report whether an element is an even integer."; eq(x - 2 * floor(x / 2), 0) }
+def u:width(text) { "Measure a string element in characters."; str_len(text) }
+def u:twice(x) { "Expand one element into two copies."; [x, x] }
+def u:small_enough(x) { "Accept elements below eight, rejecting the rest."; if lt(x, 8) { ok(x) } else { err({kind: "out_of_range", value: x}) } }
+
+# The shared tail: keep even values, square them. Bound once, reused below.
+tail = call(:u:comp2, call(:u:filter_t, :u:is_even), call(:u:map_t, :u:square))
+
+# The array pipeline: increment, then the shared tail.
+numbers = call(:u:comp2, call(:u:map_t, :u:increment), tail)
+
+# The string pipeline: measure, then the SAME shared tail.
+widths = call(:u:comp2, call(:u:map_t, :u:width), tail)
+
+values = range(10)
+words = ["a", "bb", "ccc", "dddd", "ee"]
+
+# One xform, three sinks.
+collected = u:transduce(numbers, :u:conj, [], values)
+summed = u:transduce(numbers, :add, 0, values)
+counted = u:transduce(numbers, :u:count_rf, 0, values)
+
+# One xform, a different source kind.
+from_words = u:transduce_list(widths, :u:conj, [], words)
+
+# Composition order is data order, so the two orders disagree.
+inc_then_keep = u:transduce(call(:u:comp2, call(:u:map_t, :u:increment), call(:u:filter_t, :u:is_even)), :u:conj, [], values)
+keep_then_inc = u:transduce(call(:u:comp2, call(:u:filter_t, :u:is_even), call(:u:map_t, :u:increment)), :u:conj, [], values)
+
+# Early termination: take three survivors out of a thousand candidates.
+first_three = call(:u:comp2, call(:u:map_t, :u:increment), call(:u:comp2, call(:u:filter_t, :u:is_even), :u:take_t))
+early = u:transduce_counted(first_three, :u:conj, {left: 3, inner: []}, range(1000))
+
+# One element in, many out: bind for the list monad, fused into the same fold.
+expanded = u:transduce(call(:u:comp2, call(:u:mapcat_t, :u:twice), call(:u:filter_t, :u:is_even)), :u:conj, [], [1, 2, 3, 4])
+
+# A Result-returning stage: the first err stops the fold the way `and_then`
+# stops a Result chain, and the diagnostic survives as the accumulator.
+guarded = call(:u:comp2, call(:u:validating_t, :u:small_enough), call(:u:map_t, :u:square))
+clean = u:transduce_counted(guarded, :add, 0, [1, 2, 3])
+rejected = u:transduce_counted(guarded, :add, 0, [1, 2, 99, 4])
+
+# The eager staged pipeline the transducer replaces, for agreement.
+staged = each(:u:square, compress(each(:u:is_even, each(:u:increment, values)), each(:u:increment, values)))
+
+# Empty and singleton sources.
+empty = u:transduce_counted(numbers, :u:conj, [], [])
+singleton = u:transduce(numbers, :u:conj, [], [1])
+
+checks = [
+  equal(collected, [4, 16, 36, 64, 100]),
+  equal(summed, 220),
+  equal(counted, 5),
+  equal(collected, staged),
+  equal(from_words, [4, 16, 4]),
+  equal(inc_then_keep, [2, 4, 6, 8, 10]),
+  equal(keep_then_inc, [1, 3, 5, 7, 9]),
+  equal(early.value.inner, [2, 4, 6]),
+  equal(early.pulled, 6),
+  equal(empty.value, []),
+  equal(empty.pulled, 0),
+  equal(singleton, [4]),
+  equal(expanded, [2, 2, 4, 4]),
+  equal([clean.value, clean.pulled], [14, 3]),
+  equal(rejected.value, err({kind: "out_of_range", value: 99})),
+  equal(rejected.pulled, 3)
+]
+
+if equal(reduce(:add, checks), tally(checks)) {
+  ok({
+    checks: tally(checks),
+    collected: collected,
+    sum: summed,
+    count: counted,
+    from_string_list: from_words,
+    early_value: early.value.inner,
+    early_pulled: early.pulled,
+    early_source_size: 1000,
+    expanded: expanded,
+    validated_sum: clean.value,
+    rejected_at_pull: rejected.pulled
+  })
+} else {
+  err({failed_indices: compress(1 - checks, range(tally(checks))), kind: "transducer_pipeline_mismatch"})
+}

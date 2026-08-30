@@ -46,3 +46,9 @@ binary-metrics:
 
 classifier-evaluation:
     ./scripts/run-classifier-evaluation
+
+transducer-pipelines:
+    ./scripts/run-transducer-pipelines
+
+transducer-cost:
+    ./scripts/run-transducer-cost

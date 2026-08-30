@@ -5,3 +5,5 @@ data-record-pipeline	demos/records/quality_json.mlpl	json-record-pipeline	yes	0	
 composition-comparison	demos/composition/equivalent_styles.mlpl	composition-equivalence	yes	0	atop,over,callable	runnable
 binary-metrics	demos/evaluation/binary_metrics.mlpl	binary-metrics-core	yes	0	exp,reduce,record,result	runnable
 classifier-evaluation	demos/evaluation/binary_metrics_json.mlpl	json-classifier-evaluation	yes	0	parse-json,record-get,exp,reduce,result	runnable
+transducer-pipelines	demos/transducers/transducer_pipelines.mlpl	transducer-composition	yes	2	partial,callable,record,result	runnable
+transducer-cost	demos/transducers/transducer_cost.mlpl	transducer-cost-accounting	yes	2	partial,callable,clock-ms,record,result	runnable

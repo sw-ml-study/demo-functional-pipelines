@@ -1,0 +1,136 @@
+# Transducers: transformation steps factored out of both the SOURCE that
+# supplies elements and the REDUCING FUNCTION that consumes them.
+#
+# A reducing function ("rf") has the shape (accumulator, element) -> accumulator.
+# A transducer is a function (rf) -> rf. sw-MLPL has no closures, so a
+# transducer is a PARTIAL: `call(:u:map_t, :u:double)` binds the stage's own
+# argument and leaves (rf, acc, x) outstanding; supplying rf yields the
+# two-argument step the driver calls once per element.
+#
+# Invariants
+# - Every stage is pure: the same element and accumulator give the same result.
+# - A stateless stage never inspects the accumulator it threads, so one xform
+#   composes with any rf and runs over any source.
+# - `u:comp2(a, b)` feeds each element through `a` first, the reverse of the
+#   (rf) -> rf wrapping order it performs.
+# - A stage that stops the fold returns the reduced envelope; drivers unwrap it.
+#
+# Complexity
+# - Logical: one pass over the source, no intermediate collection per stage.
+# - Copy: `u:conj` reallocates the collected array per element (O(n^2) copies),
+#   so scalar rfs like `:add` are the allocation-free sinks.
+# - Each driver keeps exactly one explicit loop; stages contribute none.
+
+def u:conj(acc, x) {
+  "Collect an element onto the accumulating array (copies the array).";
+  concat(acc, x)
+}
+
+def u:count_rf(acc, x) {
+  "Count elements instead of collecting them (allocation-free sink).";
+  acc + 1
+}
+
+def u:reduced(value) {
+  "Wrap a final accumulator so the driver stops pulling elements.";
+  {mlpl_reduced: 1, value: value}
+}
+
+def u:is_reduced(acc) {
+  "Report whether an accumulator is the reduced early-stop envelope.";
+  if equal(type_of(acc), "record") { has_field(acc, "mlpl_reduced") } else { 0 }
+}
+
+def u:map_t(fn, rf, acc, x) {
+  "Transducer stage: replace each element with fn applied to it.";
+  call(rf, acc, call(fn, x))
+}
+
+def u:filter_t(pred, rf, acc, x) {
+  "Transducer stage: keep only elements the bound predicate accepts.";
+  if call(pred, x) { call(rf, acc, x) } else { acc }
+}
+
+def u:take_t(rf, acc, x) {
+  "Stateful stage: pass the first `left` elements, then stop the fold.
+   Without closures the per-instance counter lives in the accumulator, so
+   this stage owns the {left, inner} envelope and the caller supplies it.";
+  if acc.left > 0 {
+    remaining = acc.left - 1;
+    stepped = {left: remaining, inner: call(rf, acc.inner, x)};
+    if remaining > 0 { stepped } else { u:reduced(stepped) }
+  } else {
+    u:reduced(acc)
+  }
+}
+
+def u:mapcat_t(fn, rf, acc, x) {
+  "Expanding stage: fn turns one element into an ARRAY of elements, each fed
+   downstream in turn. This is bind for the list monad written as a stage --
+   the intermediate array exists only for the width of one element.";
+  produced = call(fn, x);
+  inner = acc;
+  i = 0;
+  n = tally(produced);
+  while n - i {
+    inner = call(rf, inner, take(produced, 0, i));
+    i = i + 1;
+    if u:is_reduced(inner) { i = n } else { 0 }
+  };
+  inner
+}
+
+def u:validating_t(check, rf, acc, x) {
+  "Result stage: `check` returns ok(value) or err(reason). An ok value continues
+   downstream; the first err stops the fold carrying the diagnostic, which is
+   the reduced envelope playing the role `and_then` plays for a Result chain.";
+  outcome = call(check, x);
+  if is_ok(outcome) { call(rf, acc, unwrap(outcome)) } else { u:reduced(outcome) }
+}
+
+def u:comp2(outer, inner, rf) {
+  "Compose two transducers; elements flow through `outer` first.";
+  call(outer, call(inner, rf))
+}
+
+def u:transduce_counted(xform, rf, init, values) {
+  "Fold an ARRAY through xform into init, reporting elements pulled.";
+  step = call(xform, rf);
+  acc = init;
+  pulled = 0;
+  i = 0;
+  n = tally(values);
+  while n - i {
+    acc = call(step, acc, take(values, 0, i));
+    pulled = pulled + 1;
+    i = i + 1;
+    if u:is_reduced(acc) { acc = acc.value; i = n } else { 0 }
+  };
+  {value: acc, pulled: pulled}
+}
+
+def u:transduce(xform, rf, init, values) {
+  "Fold an array through xform into init.";
+  u:transduce_counted(xform, rf, init, values).value
+}
+
+def u:transduce_list_counted(xform, rf, init, items) {
+  "Fold a STRING LIST through xform into init, reporting elements pulled.";
+  step = call(xform, rf);
+  acc = init;
+  pulled = 0;
+  i = 0;
+  n = list_len(items);
+  while n - i {
+    acc = call(step, acc, unwrap(list_get(items, i)));
+    pulled = pulled + 1;
+    i = i + 1;
+    if u:is_reduced(acc) { acc = acc.value; i = n } else { 0 }
+  };
+  {value: acc, pulled: pulled}
+}
+
+def u:transduce_list(xform, rf, init, items) {
+  "Fold a string list through xform into init.";
+  u:transduce_list_counted(xform, rf, init, items).value
+}

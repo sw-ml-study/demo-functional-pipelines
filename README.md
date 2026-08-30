@@ -41,6 +41,9 @@ Executable recipes use `../sw-mlpl/target/release/mlpl-repl` by default. Set
 - `just record-lookup` pins exception-free record access.
 - `just composition-comparison` compares nesting, named stages, `atop`, and
   `over`.
+- `just transducer-pipelines` runs one transformation into several sinks and
+  over several sources, stopping the fold early.
+- `just transducer-cost` measures what that composition costs and saves.
 
 For complete verification:
 
@@ -72,7 +75,10 @@ mlpl-repl `0.20.0` built from sw-MLPL commit `5ef1ef72`.
 ```text
 catalog/demos.tsv          machine-readable demo inventory
 src/evaluation/            reusable classifier-evaluation stages
+src/transducers/           source- and sink-independent transformation stages
 demos/evaluation/          self-checking numeric and JSON applications
+demos/transducers/         composition behavior and measured cost accounting
+docs/transducers.md        transducer design, measured cost, and monad relationship
 docs/upstream-contract.md  verified capabilities and feature-pressure template
 scripts/check              pre-commit validation gate
 scripts/run-all            catalog-driven demo execution
@@ -80,6 +86,10 @@ scripts/run-tests          mlplunit selection and reporting wrapper
 scripts/validate-catalog   catalog schema and path audit
 tests/                     native mlplunit suites
 ```
+
+[Transducers](docs/transducers.md) explains how partials stand in for closures,
+what the measurements show about fusion in an interpreted per-element fold, and
+how the stages relate to sw-MLPL's Result combinators.
 
 See [future work](docs/future-work.md) for prioritized applications, testing
 adoption, conditional language opportunities, and acceptance criteria.

@@ -1,0 +1,118 @@
+include "../../src/transducers/core.mlpl"
+
+# What a transducer costs and what it saves, measured rather than claimed.
+#
+# The deterministic result is WORK ACCOUNTING: intermediate cells materialized
+# by each strategy, and elements pulled from the source. Wall-clock numbers are
+# printed as informational evidence only -- the pass/fail assertion is that
+# every strategy computes the same answer and the accounting matches.
+
+def u:increment(x) { "Add one to a numeric element."; x + 1 }
+def u:square(x) { "Square a numeric element."; x * x }
+def u:is_even(x) { "Report whether an element is an even integer."; eq(x - 2 * floor(x / 2), 0) }
+
+def u:staged_cells(values) {
+  "Count the intermediate cells an eager stage-by-stage pipeline materializes.";
+  mapped = each(:u:increment, values);
+  mask = each(:u:is_even, mapped);
+  kept = compress(mask, mapped);
+  squared = each(:u:square, kept);
+  {cells: tally(mapped) + tally(mask) + tally(kept) + tally(squared), sum: u:total(squared)}
+}
+
+def u:total(values) {
+  "Sum an array with zero as the empty-input identity.";
+  if eq(tally(values), 0) { 0 } else { reduce(:add, values) }
+}
+
+def u:pipeline() {
+  "The one transformation every strategy below runs: increment, keep even, square.";
+  call(:u:comp2, call(:u:map_t, :u:increment), call(:u:comp2, call(:u:filter_t, :u:is_even), call(:u:map_t, :u:square)))
+}
+
+def u:vectorized_sum(values) {
+  "The whole-array route: no per-element dispatch, three intermediate arrays.";
+  incremented = values + 1;
+  u:total(compress(eq(incremented - 2 * floor(incremented / 2), 0), incremented * incremented))
+}
+
+def u:report_size(n) {
+  "Print one measured row and return its deterministic accounting.";
+  values = range(n);
+  t0 = clock_ms();
+  vector_sum = u:vectorized_sum(values);
+  t_vector = clock_ms() - t0;
+  t0 = clock_ms();
+  staged = u:staged_cells(values);
+  t_staged = clock_ms() - t0;
+  t0 = clock_ms();
+  fused = u:transduce(u:pipeline(), :add, 0, values);
+  t_fused = clock_ms() - t0;
+  print("  n =", n,
+        "| vectorized", t_vector, "ms",
+        "| staged", t_staged, "ms",
+        "| transducer", t_fused, "ms",
+        "| transducer us/element", 1000 * t_fused / n);
+  {n: n, agree: equal([vector_sum, staged.sum], [fused, fused]), staged_cells: staged.cells, fused_cells: 0}
+}
+
+def u:probe_indexing(n) {
+  "Time five single-element reads of an n-element array and nothing else.
+   The checksum is fixed at 0+1+2+3+4 = 10, so only the clock varies with n.";
+  values = range(n);
+  t0 = clock_ms();
+  i = 0;
+  total = 0;
+  while 5 - i { total = total + take(values, 0, i); i = i + 1 };
+  {n: n, ms: clock_ms() - t0, checksum: total}
+}
+
+print("Three strategies, same answer, growing input:");
+small = u:report_size(500);
+medium = u:report_size(1000);
+large = u:report_size(2000);
+
+# Early termination over a source no strategy wants to materialize twice.
+haystack = 4000;
+first_three = call(:u:comp2, call(:u:map_t, :u:increment), call(:u:comp2, call(:u:filter_t, :u:is_even), :u:take_t));
+early = u:transduce_counted(first_three, :u:conj, {left: 3, inner: []}, range(haystack));
+all_of_it = u:transduce_counted(u:pipeline(), :u:count_rf, 0, range(haystack));
+
+print("Early stop: transducer pulled", early.pulled, "of", haystack, "elements; the eager route pulls", all_of_it.pulled);
+print("Intermediate cells at n = 2000: staged", large.staged_cells, "| transducer", large.fused_cells);
+
+# Why the transducer column above grows per element: reading ONE element copies
+# the whole source, so the driver's per-element cost tracks the source size.
+tiny_read = u:probe_indexing(10000);
+mid_read = u:probe_indexing(100000);
+big_read = u:probe_indexing(1000000);
+print("Five single-element reads:",
+      "n = 10000 ->", tiny_read.ms, "ms |",
+      "n = 100000 ->", mid_read.ms, "ms |",
+      "n = 1000000 ->", big_read.ms, "ms");
+
+checks = [
+  small.agree,
+  medium.agree,
+  large.agree,
+  equal(large.staged_cells, 2 * 2000 + 2 * 1000),
+  equal(large.fused_cells, 0),
+  equal(early.value.inner, [2, 4, 6]),
+  equal(early.pulled, 6),
+  equal(all_of_it.pulled, haystack),
+  equal([tiny_read.checksum, mid_read.checksum, big_read.checksum], [10, 10, 10])
+]
+
+if equal(reduce(:add, checks), tally(checks)) {
+  ok({
+    checks: tally(checks),
+    staged_cells_at_2000: large.staged_cells,
+    transducer_cells_at_2000: large.fused_cells,
+    early_pulled: early.pulled,
+    eager_pulled: all_of_it.pulled,
+    haystack: haystack,
+    single_read_ms_by_size: [tiny_read.ms, mid_read.ms, big_read.ms]
+  })
+} else {
+  err({failed_indices: compress(1 - checks, range(tally(checks))), kind: "transducer_cost_mismatch"})
+}
