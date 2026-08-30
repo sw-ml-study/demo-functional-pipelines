@@ -1,8 +1,9 @@
 number = 5
 slug = "transducers"
-status = "in-progress"
+status = "completed"
 description = "Demonstrate Clojure-style transducers in sw-MLPL: a composable library (src/t..."
 role = "production"
 context_files = []
 created_at = "2026-08-30T12:19:31"
-commits = []
+completed_at = "2026-08-30T12:30:22"
+commits = ["9dbbbe75f43d7924b445169f0fd2c8fafc13ef7a"]
